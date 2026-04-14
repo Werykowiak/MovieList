@@ -455,3 +455,5 @@ FodyWeavers.xsd
 # Additional files built by Visual Studio
 
 # End of https://www.toptal.com/developers/gitignore/api/angular,visualstudiocode,visualstudio,dotnetcore
+MovieListFrontEnd/src/environments/environment.ts
+MovieListFrontEnd/src/environments/environment.development.ts

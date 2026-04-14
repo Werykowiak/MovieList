@@ -7,6 +7,6 @@ namespace MovieListBackEnd
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public DbSet<MovieStatus> MovieStatuses { get; set; }
+        public DbSet<MovieStatusModel> MovieStatuses { get; set; }
     }
 }

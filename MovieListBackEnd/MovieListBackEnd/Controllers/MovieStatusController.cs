@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MovieListBackEnd.Dtos;
 using MovieListBackEnd.Interfaces;
+using MovieListBackEnd.Models;
 
 namespace MovieListBackEnd.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class MovieStatusController: ControllerBase
+    public class MovieStatusController : ControllerBase
     {
         private readonly IMovieStatusService _movieStatusService;
 
@@ -15,9 +17,9 @@ namespace MovieListBackEnd.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddMovieStatus([FromBody] Models.MovieStatus movieStatus)
+        public async Task<IActionResult> AddMovieStatus([FromBody] MovieStatusDto movieStatus)
         {
-            var result = await _movieStatusService.AddAsync(movieStatus);
+            var result = await _movieStatusService.AddAsync(new MovieStatusModel(movieStatus));
             return CreatedAtAction(nameof(GetMovieStatusById), new { id = result.Id }, result);
         }
         [HttpGet("id")]
@@ -26,13 +28,42 @@ namespace MovieListBackEnd.Controllers
             try
             {
                 var result = await _movieStatusService.GetByIdAsync(id);
-                return Ok(result);
+                return Ok(new MovieStatusDto(result));
             }
             catch (KeyNotFoundException)
             {
                 return NotFound();
 
             }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetAllMovieStatuses()
+        {
+            var result = await _movieStatusService.GetAllAsync();
+            return Ok(result.Select(ms => new MovieStatusDto(ms)));
+        }
+        [HttpPut("id")]
+        public async Task<IActionResult> UpdateMovieStatus(int id, [FromBody] MovieStatusDto movieStatus)
+        {
+            try
+            {
+                var result = await _movieStatusService.UpdateAsync(id, new MovieStatusModel(movieStatus));
+                return Ok(new MovieStatusDto(result));
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+        }
+        [HttpDelete("id")]
+        public async Task<IActionResult> DeleteMovieStatus(int id)
+        {
+            var result = await _movieStatusService.DeleteAsync(id);
+            if (!result)
+            {
+                return NotFound();
+            }
+            return NoContent();
         }
     }
 }

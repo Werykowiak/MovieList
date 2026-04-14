@@ -12,7 +12,7 @@ namespace MovieListBackEnd.Services
             _context = context;
         }
 
-        public async Task<MovieStatus> AddAsync(MovieStatus movieStatus)
+        public async Task<MovieStatusModel> AddAsync(MovieStatusModel movieStatus)
         {
             var result = await _context.MovieStatuses.AddAsync(movieStatus);
             await _context.SaveChangesAsync();
@@ -31,12 +31,12 @@ namespace MovieListBackEnd.Services
             return true;
         }
 
-        public async Task<List<MovieStatus>> GetAllAsync()
+        public async Task<List<MovieStatusModel>> GetAllAsync()
         {
             return await _context.MovieStatuses.ToListAsync();
         }
 
-        public async Task<MovieStatus> GetByIdAsync(int id)
+        public async Task<MovieStatusModel> GetByIdAsync(int id)
         {
             var result = await _context.MovieStatuses.FindAsync(id);
             if(result == null)
@@ -46,7 +46,7 @@ namespace MovieListBackEnd.Services
             return result;
         }
 
-        public async Task<MovieStatus> UpdateAsync(int id, MovieStatus movieStatus)
+        public async Task<MovieStatusModel> UpdateAsync(int id, MovieStatusModel movieStatus)
         {
             var localMovieStatus = await _context.MovieStatuses.FindAsync(id);
             if (movieStatus == null)

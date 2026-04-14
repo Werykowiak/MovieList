@@ -4,10 +4,10 @@ namespace MovieListBackEnd.Interfaces
 {
     public interface IMovieStatusService
     {
-        public Task<MovieStatus> AddAsync(MovieStatus movieStatus);
-        public Task<MovieStatus> GetByIdAsync(int id);
-        public Task<List<MovieStatus>> GetAllAsync();
-        public Task<MovieStatus> UpdateAsync(int id, MovieStatus movieStatus);
+        public Task<MovieStatusModel> AddAsync(MovieStatusModel movieStatus);
+        public Task<MovieStatusModel> GetByIdAsync(int id);
+        public Task<List<MovieStatusModel>> GetAllAsync();
+        public Task<MovieStatusModel> UpdateAsync(int id, MovieStatusModel movieStatus);
         public Task<bool> DeleteAsync(int id);
     }
 }
