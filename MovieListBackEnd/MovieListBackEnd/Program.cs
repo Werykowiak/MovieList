@@ -11,7 +11,15 @@ namespace MovieListBackEnd
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AngularClient", policy =>
+                {
+                    policy.WithOrigins("http://localhost:4200") // Adres Twojego Angulara
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
             // Add services to the container.
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnectionString")));
@@ -35,7 +43,7 @@ namespace MovieListBackEnd
 
             app.UseAuthorization();
 
-
+            app.UseCors("AngularClient");
             app.MapControllers();
 
             app.Run();

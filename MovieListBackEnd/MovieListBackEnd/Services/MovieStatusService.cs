@@ -35,6 +35,10 @@ namespace MovieListBackEnd.Services
         {
             return await _context.MovieStatuses.ToListAsync();
         }
+        public async Task<List<MovieStatusModel>> GetBatchAsync(List<int> ids)
+        {
+            return await _context.MovieStatuses.Where(ms => ids.Contains(ms.Id)).ToListAsync();
+        }
 
         public async Task<MovieStatusModel> GetByIdAsync(int id)
         {

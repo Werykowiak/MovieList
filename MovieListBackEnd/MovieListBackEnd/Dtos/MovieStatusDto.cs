@@ -11,7 +11,7 @@ namespace MovieListBackEnd.Dtos
         [Range(0, 10)]
         [Precision(4, 2)]
         public decimal? Rating { get; set; }
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
 
         public MovieStatusDto(MovieStatusModel model) 
         {

@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Movie } from '../models/movie';
-import { TmdbResponse } from '../models/tmdbResponse';
+import { TmdbResponse } from '../Dtos/tmdbResponse';
 import { environment } from '../../environments/environment';
 
 @Injectable({

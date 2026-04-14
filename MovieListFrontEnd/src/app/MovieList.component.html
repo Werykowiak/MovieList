@@ -1,6 +1,4 @@
-<div style="position: fixed; top: 80px; left: 10px; z-index: 10001; background: yellow; padding: 10px; border: 2px solid black;">
-  Debug -> isLoading: <strong>{{ isLoading }}</strong>
-</div>
+
 <div *ngIf="isLoading" class="spinner-container">
   <mat-progress-spinner 
     mode="indeterminate" 
@@ -42,7 +40,7 @@
       <button mat-icon-button color="warn">
         <mat-icon>remove_red_eye</mat-icon>
       </button>
-      <button mat-icon-button color="warn">
+      <button mat-icon-button color="warn" (click)="addToWatch(movie.id)" [disabled]="isAddingToWatch(movie.id)">
         <mat-icon>watch_later</mat-icon>
       </button>
     </mat-card-actions>

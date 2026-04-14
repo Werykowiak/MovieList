@@ -42,6 +42,16 @@ namespace MovieListBackEnd.Controllers
             var result = await _movieStatusService.GetAllAsync();
             return Ok(result.Select(ms => new MovieStatusDto(ms)));
         }
+        [HttpGet("batch")]
+        public async Task<IActionResult> GetBatchStatuses([FromQuery] List<int> ids)
+        {
+            if (ids == null || !ids.Any())
+            {
+                return BadRequest("Empty ID list.");
+            }
+            var result = await _movieStatusService.GetBatchAsync(ids);
+            return Ok(result.Select(ms => new MovieStatusDto(ms)));
+        }
         [HttpPut("id")]
         public async Task<IActionResult> UpdateMovieStatus(int id, [FromBody] MovieStatusDto movieStatus)
         {
