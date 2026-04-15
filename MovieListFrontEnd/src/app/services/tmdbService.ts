@@ -3,6 +3,7 @@ import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { TmdbResponse } from '../Dtos/tmdbResponse';
 import { environment } from '../../environments/environment';
+import { MovieStatus } from '../Dtos/MovieStatus';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,6 @@ export class TMDBService{
     'accept': 'application/json',
     'Authorization': `Bearer ${this.apiKey}`
     });
-      
     return this.http.get<TmdbResponse>(`${this.apiUrl}/movie/${category}`, { headers, params });
   }
 }

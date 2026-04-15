@@ -40,7 +40,7 @@
       <button mat-icon-button color="warn">
         <mat-icon>remove_red_eye</mat-icon>
       </button>
-      <button mat-icon-button color="warn" (click)="addToWatch(movie.id)" [disabled]="isAddingToWatch(movie.id)">
+      <button *ngIf="movie.movieStatus==null" mat-icon-button color="warn" (click)="addToWatch(movie.id)" [disabled]="isAddingToWatch(movie.id)" >
         <mat-icon>watch_later</mat-icon>
       </button>
     </mat-card-actions>

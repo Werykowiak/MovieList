@@ -1,3 +1,4 @@
+import { MovieStatus } from './MovieStatus';
 export interface Movie {
   id: number;
   title: string;
@@ -5,4 +6,5 @@ export interface Movie {
   release_date: string;
   vote_average: number;
   overview: string;
+  movieStatus?: MovieStatus | null;
 }
