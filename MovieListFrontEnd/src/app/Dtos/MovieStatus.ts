@@ -1,8 +1,8 @@
 export class MovieStatus {
   constructor(
-    public Id: number,
-    public Watched: boolean = false,
-    public Rating: number | null = null,
-    public Comment: string | null = null
+    public id: number,
+    public watched: boolean = false,
+    public rating: number | null = null,
+    public comment: string | null = null
   ) {}
 }

@@ -6,5 +6,5 @@ export interface Movie {
   release_date: string;
   vote_average: number;
   overview: string;
-  movieStatus?: MovieStatus | null;
+  movieStatus: MovieStatus | null;
 }

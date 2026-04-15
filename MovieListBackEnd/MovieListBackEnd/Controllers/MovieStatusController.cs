@@ -22,7 +22,7 @@ namespace MovieListBackEnd.Controllers
             var result = await _movieStatusService.AddAsync(new MovieStatusModel(movieStatus));
             return CreatedAtAction(nameof(GetMovieStatusById), new { id = result.Id }, result);
         }
-        [HttpGet("id")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetMovieStatusById(int id)
         {
             try
@@ -52,7 +52,7 @@ namespace MovieListBackEnd.Controllers
             var result = await _movieStatusService.GetBatchAsync(ids);
             return Ok(result.Select(ms => new MovieStatusDto(ms)));
         }
-        [HttpPut("id")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMovieStatus(int id, [FromBody] MovieStatusDto movieStatus)
         {
             try
@@ -65,7 +65,7 @@ namespace MovieListBackEnd.Controllers
                 return NotFound();
             }
         }
-        [HttpDelete("id")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMovieStatus(int id)
         {
             var result = await _movieStatusService.DeleteAsync(id);

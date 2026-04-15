@@ -15,6 +15,8 @@ import { MatPaginator } from '@angular/material/paginator';
 import { ChangeDetectorRef } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { switchMap, map } from 'rxjs/operators';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MovieRatingDialogComponent } from './MovieRatingDialogComponent'
 @Component({
   selector: 'app-movie-list',
   standalone: true,
@@ -24,7 +26,8 @@ import { switchMap, map } from 'rxjs/operators';
     MatButtonModule,
     MatIconModule,
     MatPaginatorModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatDialogModule
   ],
   templateUrl: './MovieList.component.html',
   styleUrls: ['./MovieList.component.scss']
@@ -32,8 +35,9 @@ import { switchMap, map } from 'rxjs/operators';
 export class MovieListComponent implements OnInit {
   private _snackBar = inject(MatSnackBar);
   private cdr = inject(ChangeDetectorRef);
+  private dialog = inject(MatDialog);
   movies: Movie[] = [];
-  currentPage: number = 0;
+  currentPage: number = 1;
   total_results: number = 0;
   category: string = '';
   isLoading: boolean = false;
@@ -45,11 +49,15 @@ export class MovieListComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      this.category = params['category'] || 'popular';
-      this.currentPage = 1;
-      this.isLoading = false;
-      if (this.paginator) {
-        this.paginator.pageIndex = 0;
+      const newCategory = params['category'] || 'popular';
+
+      // Resetujemy do 1 strony TYLKO jeśli zmieniła się kategoria
+      if (this.category !== newCategory) {
+        this.category = newCategory;
+        this.currentPage = 1;
+        if (this.paginator) {
+          this.paginator.pageIndex = 0;
+        }
       }
       setTimeout(() => this.triggerLoad());
     });
@@ -60,17 +68,14 @@ export class MovieListComponent implements OnInit {
     this.cdr.detectChanges();
 
     this.tmdbService.getMovies(this.category, this.currentPage).pipe(
-      // 1. Pobieramy filmy z TMDB
+
       switchMap(response => {
         const tmdbMovies = response.results;
         const movieIds = tmdbMovies.map((m: any) => m.id);
 
-        // 2. Pobieramy statusy z Twojego backendu
         return this.movieListService.getBatchMovieStatus(movieIds).pipe(
           map(statuses => {
-            // 3. Łączymy dane wewnątrz strumienia
             const enrichedMovies = tmdbMovies.map((movie: any) => {
-              // Szukamy statusu (używamy luźnego porównania == dla pewności typów)
               const foundStatus = statuses.find((s: any) => (s.id || s.Id) == movie.id);
 
               return {
@@ -92,11 +97,10 @@ export class MovieListComponent implements OnInit {
       })
     ).subscribe({
       next: (finalData) => {
-        // PRZYPISUJEMY TYLKO RAZ - Angular na pewno to zauważy
+
         this.movies = finalData.results;
         this.total_results = Math.min(finalData.total_results, 500 * 20);
 
-        console.log('Finalne filmy w komponencie:', this.movies);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       },
       error: (err) => {
@@ -111,39 +115,100 @@ export class MovieListComponent implements OnInit {
     this.triggerLoad();
   }
   addToWatch(id: number) {
-  // 1. Blokujemy przycisk (asynchronicznie, by uniknąć NG0100)
-  Promise.resolve().then(() => {
-    this.loadingToWatchIds.add(id);
-    this.cdr.detectChanges();
-  });
-
-  this.movieListService.addToWatch(id).pipe(
-    finalize(() => {
-      this.loadingToWatchIds.delete(id);
+    Promise.resolve().then(() => {
+      this.loadingToWatchIds.add(id);
       this.cdr.detectChanges();
-    })
-  )
-  .subscribe({
-    next: (newStatus: MovieStatus) => {
-      // 2. Znajdujemy film na liście i doklejamy mu status z odpowiedzi
-      this.movies = this.movies.map(movie => {
-        if (movie.id === id) {
-          return {
-            ...movie,
-            movieStatus: newStatus // Doklejamy to, co zwrócił backend
-          };
-        }
-        return movie;
-      });
+    });
+    let movieStatus = new MovieStatus(id);
+    this.movieListService.addToWatch(movieStatus).pipe(
+      finalize(() => {
+        this.loadingToWatchIds.delete(id);
+        this.cdr.detectChanges();
+      })
+    ).subscribe({
+      next: (newStatus: MovieStatus) => {
+        this.movies = this.movies.map(movie => {
+          if (movie.id === id) {
+            return {
+              ...movie,
+              movieStatus: newStatus
+            };
+          }
+          return movie;
+        });
 
-      this._snackBar.open('Added to watch', 'OK', { duration: 3000 });
-      this.cdr.detectChanges(); // Wymuszamy odświeżenie widoku (ikony/przyciski)
-    },
-    error: (err) => {
-      this._snackBar.open('Error saving status', 'Close', { duration: 5000 });
-    }
-  });
-}
+        this._snackBar.open('Added to watch', 'OK', { duration: 3000 });
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this._snackBar.open('Error saving status', 'Close', { duration: 5000 });
+      }
+    });
+  }
+
+  deleteFromWatch(id: number) {
+    Promise.resolve().then(() => {
+      this.loadingToWatchIds.add(id);
+      this.cdr.detectChanges();
+    });
+    this.movieListService.deleteMovieStatus(id).pipe(
+      finalize(() => {
+        const movie = this.movies.find(m => m.id === id);
+        if (movie) {
+          movie.movieStatus = null;
+        }
+        this.loadingToWatchIds.delete(id);
+        this.cdr.detectChanges();
+      })
+    ).subscribe({
+      next: () => {
+        this._snackBar.open('Deleted from to watch list', 'OK', { duration: 3000 });
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this._snackBar.open('Error saving status', 'Close', { duration: 5000 });
+      }
+    });
+
+  }
+
+  openRatingDialog(movie: any) {
+    const dialogRef = this.dialog.open(MovieRatingDialogComponent, {
+      width: '400px',
+      data: { Rating: movie.movieStatus?.Rating || null, Comment: movie.movieStatus?.Comment || '' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        if (!movie.movieStatus) {
+          movie.movieStatus = new MovieStatus(movie.id,true, result.Rating, result.Comment);
+          this.cdr.detectChanges();
+          this.movieListService.addToWatch(movie.movieStatus).subscribe({
+            next: () => {
+              this._snackBar.open('Rating saved', 'OK', { duration: 3000 });
+              this.cdr.detectChanges();
+            },
+            error: (err) => {
+              this._snackBar.open('Error saving status', 'Close', { duration: 5000 });
+            }
+          });
+        } else {
+          movie.movieStatus.watched = true;
+          movie.movieStatus.rating = result.Rating;
+          movie.movieStatus.comment = result.Comment;
+          this.movieListService.updateMovieStatus(movie.movieStatus).subscribe({
+            next: () => {
+              this._snackBar.open('Rating saved', 'OK', { duration: 3000 });
+              this.cdr.detectChanges();
+            },
+            error: (err) => {
+              this._snackBar.open('Error saving status', 'Close', { duration: 5000 });
+            }
+          });
+        }
+      }
+    });
+  }
 
   isAddingToWatch(id: number): boolean {
     return this.loadingToWatchIds.has(id);

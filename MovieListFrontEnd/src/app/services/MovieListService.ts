@@ -10,17 +10,22 @@ import { MovieStatus } from '../Dtos/MovieStatus'
 export class MovieListService {
     private readonly apiUrl = environment.myApiUrl;
     constructor(private http: HttpClient) { }
-    addToWatch(movieId: number): Observable<any> {
-        const newMovieStatus = new MovieStatus(movieId);
-        return this.http.post(`${this.apiUrl}/MovieStatus`, newMovieStatus);
+    addToWatch(movieStatus: MovieStatus): Observable<any> {
+        console.log('Adding to watch:', movieStatus);
+        return this.http.post(`${this.apiUrl}/MovieStatus`, movieStatus);
     }
     getBatchMovieStatus(movieIds: number[]): Observable<MovieStatus[]> {
         let params = new HttpParams();
-
-        // Dodajemy każdy ID jako osobny parametr o tym samym kluczu 'ids'
         movieIds.forEach(id => {
             params = params.append('ids', id.toString());
         });
         return this.http.get<MovieStatus[]>(`${this.apiUrl}/MovieStatus/batch`, { params });
+    }
+    deleteMovieStatus(movieId: number){
+        return this.http.delete(`${this.apiUrl}/MovieStatus/${movieId}`)
+    }
+    updateMovieStatus(movieStatus: MovieStatus){
+        console.log('Updating movie status:', movieStatus);
+        return this.http.put(`${this.apiUrl}/MovieStatus/${movieStatus.id}`, movieStatus);
     }
 }
