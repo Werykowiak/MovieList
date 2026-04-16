@@ -28,4 +28,11 @@ export class MovieListService {
         console.log('Updating movie status:', movieStatus);
         return this.http.put(`${this.apiUrl}/MovieStatus/${movieStatus.id}`, movieStatus);
     }
+    getToWatchMovies(): Observable<MovieStatus[]> {
+        return this.http.get<MovieStatus[]>(`${this.apiUrl}/MovieStatus/ToWatch`);
+    }
+    getWatchedMovies(): Observable<MovieStatus[]> {
+        return this.http.get<MovieStatus[]>(`${this.apiUrl}/MovieStatus/Watched`);
+    }
+
 }

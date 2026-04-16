@@ -36,6 +36,18 @@ namespace MovieListBackEnd.Controllers
 
             }
         }
+        [HttpGet("ToWatch")]
+        public async Task<IActionResult> GetToWatchMovieStatuses()
+        {
+            var result = await _movieStatusService.GetToWatchAsync();
+            return Ok(result.Select(ms => new MovieStatusDto(ms)));
+        }
+        [HttpGet("Watched")]
+        public async Task<IActionResult> GetWatchedMovieStatuses()
+        {
+            var result = await _movieStatusService.GetWatchedAsync();
+            return Ok(result.Select(ms => new MovieStatusDto(ms)));
+        }
         [HttpGet]
         public async Task<IActionResult> GetAllMovieStatuses()
         {

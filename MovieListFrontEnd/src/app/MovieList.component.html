@@ -1,51 +1,61 @@
 @if(isLoading){
-  <div class="spinner-container">
-    <mat-progress-spinner mode="indeterminate" color="primary">
-    </mat-progress-spinner>
-  </div>
+<div class="spinner-container">
+  <mat-progress-spinner mode="indeterminate" color="primary">
+  </mat-progress-spinner>
+</div>
 }@else
 {
-  <mat-paginator #paginator [length]="total_results" [pageSize]="20" [pageIndex]="currentPage - 1" [hidePageSize]="true" [disabled]="isLoading"
-    [showFirstLastButtons]="true" (page)="onPageChange($event)" aria-label="Select page">
+  @if(category !== 'to-watch' && category !== 'watched'){
+  <mat-paginator #paginator [length]="total_results" [pageSize]="20" [pageIndex]="currentPage - 1" [hidePageSize]="true"
+    [disabled]="isLoading" [showFirstLastButtons]="true" (page)="onPageChange($event)" aria-label="Select page">
   </mat-paginator>
-  <div class="movie-grid">
-    <mat-card *ngFor="let movie of movies" class="movie-card">
-      <img mat-card-image
-        [src]="movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : 'assets/no-poster.png'"
-        [alt]="movie.title">
+  }
 
-      <mat-card-header>
-        <mat-card-title>{{ movie.title }}</mat-card-title>
-        <mat-card-subtitle>
-          Ocena: <strong>{{ movie.vote_average | number:'1.1-1' }}</strong> / 10
-        </mat-card-subtitle>
-      </mat-card-header>
+<div class="movie-grid">
+  <mat-card *ngFor="let movie of movies" class="movie-card"
+    [class.in-watch-list]="movie.movieStatus && !movie.movieStatus.watched">
+    <img mat-card-image
+      [src]="movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : 'assets/no-poster.png'"
+      [alt]="movie.title">
 
-      <mat-card-content>
-        <p class="overview">
-          {{ movie.overview | slice:0:120 }}{{ movie.overview.length > 120 ? '...' : '' }}
-        </p>
-      </mat-card-content>
+    <mat-card-header>
+      <mat-card-title>{{ movie.title }}</mat-card-title>
+      <mat-card-subtitle>
+        Ocena: <strong>{{ movie.vote_average | number:'1.1-1' }}</strong> / 10
+      </mat-card-subtitle>
+    </mat-card-header>
 
-      <mat-card-actions>
-        <button mat-button color="primary">Details</button>
-        <button mat-icon-button color="warn" (click)="openRatingDialog(movie)">
-          <mat-icon>remove_red_eye</mat-icon>
-        </button>
-        @if(!movie.movieStatus){
-        <button mat-icon-button color="warn" (click)="addToWatch(movie.id)"
-          [disabled]="isAddingToWatch(movie.id)">
-          <mat-icon>watch_later</mat-icon>
-        </button>
-        }@else if(!movie.movieStatus.watched){
-          <button mat-icon-button  (click)="deleteFromWatch(movie.id)"
-            [disabled]="isAddingToWatch(movie.id)">
-            <mat-icon style="color: var(--mat-sys-error)">watch_later</mat-icon>
-          </button>
+    <mat-card-content>
+      <p class="overview">
+        {{ movie.overview | slice:0:120 }}{{ movie.overview.length > 120 ? '...' : '' }}
+      </p>
+      @if(movie.movieStatus && movie.movieStatus.rating !== null){
+      <div class="user-rating">
+        <span class="rating-badge">Your Rate <strong>{{ movie.movieStatus.rating }}/10</strong></span>
+        @if(movie.movieStatus.comment){
+        <p class="user-comment">{{ movie.movieStatus.comment }}</p>
         }
+      </div>
+      }
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-icon-button color="warn" (click)="openRatingDialog(movie)">
+        <mat-icon>remove_red_eye</mat-icon>
+      </button>
+      @if(!movie.movieStatus){
+      <button mat-icon-button color="warn" (click)="addToWatch(movie.id)" [disabled]="isAddingToWatch(movie.id)">
+        <mat-icon>watch_later</mat-icon>
+      </button>
+      }@else{
+      <span style="flex: 1"></span>
+      <button mat-icon-button (click)="deleteFromWatch(movie.id)" [disabled]="isAddingToWatch(movie.id)">
+        <mat-icon style="color: var(--mat-sys-error)">delete</mat-icon>
+      </button>
+      }
 
 
-      </mat-card-actions>
-    </mat-card>
-  </div>
+    </mat-card-actions>
+  </mat-card>
+</div>
 }

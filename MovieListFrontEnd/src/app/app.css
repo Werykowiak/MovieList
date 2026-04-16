@@ -1,0 +1,13 @@
+.spacer {
+  flex: 1;
+}
+.main {
+  padding: 16px;
+}
+.nav-links {
+  margin-left: 16px;
+}
+.search-field {
+  margin-left: auto;
+  width: 300px;
+}

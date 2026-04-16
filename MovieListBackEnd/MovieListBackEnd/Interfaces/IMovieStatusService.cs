@@ -8,6 +8,8 @@ namespace MovieListBackEnd.Interfaces
         public Task<MovieStatusModel> GetByIdAsync(int id);
         public Task<List<MovieStatusModel>> GetBatchAsync(List<int> ids);
         public Task<List<MovieStatusModel>> GetAllAsync();
+        public Task<List<MovieStatusModel>> GetToWatchAsync();
+        public Task<List<MovieStatusModel>> GetWatchedAsync();
         public Task<MovieStatusModel> UpdateAsync(int id, MovieStatusModel movieStatus);
         public Task<bool> DeleteAsync(int id);
     }

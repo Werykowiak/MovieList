@@ -3,13 +3,15 @@ import { RouterModule, Routes } from '@angular/router';
 import { MovieListComponent } from './MovieList.component'; 
 
 export const routes: Routes = [
-  // Przekierowanie ze strony głównej na popularne filmy
   { path: '', redirectTo: '/movies/popular', pathMatch: 'full' },
   
-  // Dynamiczna ścieżka dla kategorii
   { path: 'movies/:category', component: MovieListComponent },
   
-  // Opcjonalnie: strona błędu 404, jeśli ktoś wpisze coś dziwnego
+  { path: 'movies/search', component: MovieListComponent },
+  
+  { path: 'movies/watched', component: MovieListComponent },
+  { path: 'movies/to-watch', component: MovieListComponent },
+
   { path: '**', redirectTo: '/movies/popular' }
 ];
 

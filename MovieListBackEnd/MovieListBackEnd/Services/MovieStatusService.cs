@@ -50,6 +50,16 @@ namespace MovieListBackEnd.Services
             return result;
         }
 
+        public async Task<List<MovieStatusModel>> GetToWatchAsync()
+        {
+            return await _context.MovieStatuses.Where(ms => ms.Watched == false).ToListAsync();
+        }
+
+        public async Task<List<MovieStatusModel>> GetWatchedAsync()
+        {
+            return await _context.MovieStatuses.Where(ms => ms.Watched == true).ToListAsync();
+        }
+
         public async Task<MovieStatusModel> UpdateAsync(int id, MovieStatusModel movieStatus)
         {
             var localMovieStatus = await _context.MovieStatuses.FindAsync(id);
